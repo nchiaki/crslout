@@ -31,21 +31,25 @@ trim_line_end(char *linep)
   }
 }
 
+char  *dsmccprms[] = {"dsmcc1=","dsmcc2=","dsmcc3="};
+char  *pidprms[] = {"pid1=","pid2=","pid3="};
+
 void
 make_destrib_info(char *lnbf)
 {
-  char  *cp, *stripadr, *strprt, *dsmccfl, *strpid;
-  int prtnm, nsprtnm, pid;
+  char  *cp, *stripadr, *strprt, *dsmccfl[DSMCCFILES], *strpid[DSMCCFILES], *updtf;
+  int   ix, prtnm, nsprtnm, pid[DSMCCFILES];
   DSTRBINFO *dtrbp;
 
   stripadr = NULL;
-  dsmccfl = NULL;
+  updtf = NULL;
 
   strprt = NULL;
   nsprtnm = 0;
 
-  strpid = NULL;
-  pid = 0;
+  memset(dsmccfl, 0, sizeof(dsmccfl));
+  memset(strpid, 0, sizeof(strpid));
+  memset(pid, 0, sizeof(pid));
 
   dtrbp = NULL;
 
@@ -59,23 +63,33 @@ make_destrib_info(char *lnbf)
   {
     strprt = cp + strlen("port=");
   }
-  cp = strstr(lnbf, "dsmccfile=");
+
+  cp = strstr(lnbf, "update=");
+  if (cp)
   {
-    dsmccfl = cp + strlen("dsmccfile=");
+    updtf = cp + strlen("update=");
   }
-  cp = strstr(lnbf, "pid=");
+  for (ix=0; ix<DSMCCFILES; ix++)
   {
-    strpid = cp + strlen("pid=");
+    cp = strstr(lnbf, dsmccprms[ix]);
+    {
+      dsmccfl[ix] = cp + strlen(dsmccprms[ix]);
+    }
+    cp = strstr(lnbf, pidprms[ix]);
+    {
+      strpid[ix] = cp + strlen(pidprms[ix]);
+    }
   }
 
   if (stripadr)
   {
     trim_line_end(stripadr);
   }
-  if (dsmccfl)
+  if (updtf)
   {
-    trim_line_end(dsmccfl);
+    trim_line_end(updtf);
   }
+
   if (strprt)
   {
     trim_line_end(strprt);
@@ -86,21 +100,26 @@ make_destrib_info(char *lnbf)
   {
     nsprtnm = rcvinfo.src_addr.sin_port;
   }
-  if (strpid)
+  for (ix=0; ix<DSMCCFILES; ix++)
   {
-    int lwc;
-    trim_line_end(strpid);
-    cp = strpid;
-    while (*cp)
+    if (strpid[ix])
     {
-      lwc = tolower(*cp);
-      if (('0' <= lwc) && (lwc <= '9'))
-        {pid = ((pid << 4)|(lwc - '0'));}
-      else
-        {pid = ((pid << 4)|((lwc - 'a')+10));}
-      cp++;
+      int lwc;
+      trim_line_end(strpid[ix]);
+      cp = strpid[ix];
+      while (*cp)
+      {
+        lwc = tolower(*cp);
+        if (('0' <= lwc) && (lwc <= '9'))
+          {pid[ix] = ((pid[ix] << 4)|(lwc - '0'));}
+        else
+          {pid[ix] = ((pid[ix] << 4)|((lwc - 'a')+10));}
+        cp++;
+      }
     }
   }
+
+  /*====*/
 
   if (stripadr)
   {
@@ -128,8 +147,12 @@ make_destrib_info(char *lnbf)
           exit(1);
         }
 #endif
-        dtrbp->pid = pid;
-        dtrbp->dsmccfnm = dsmccfl;
+        for (ix=0; ix<DSMCCFILES; ix++)
+        {
+          dtrbp->dsmcc[ix]._pid = pid[ix];
+          dtrbp->dsmcc[ix]._fnm = dsmccfl[ix];
+        }
+        dtrbp->updtfnm = updtf;
         ts_dsmcc_section_preparation(dtrbp);
 
         dtrbp->dsmcc_pretv.tv_sec = 0;

@@ -47,18 +47,24 @@ typedef struct recv_info {
   struct timeval  rcv_time;
 } RCVINFO;
 
+#define DSMCCFILES  3
+typedef struct dsmcc_file_info {
+  int             _pid;
+  char            *_fnm;
+  void            *_data;
+  int             _len;
+  struct timespec _st_mtim;  /* 最終修正時刻 */
+} DSMCCINF;
 typedef struct destribution_info {
   QUE             queue;
   struct sockaddr_in dst_addr;
   socklen_t       addrlen;
   int             dst_port;
   int             sock;
-  int             pid;
-  char            *dsmccfnm;
-  void            *dsmcc;
-  int             dsmcc_len;
-  struct timeval  dsmcc_pretv;
+  DSMCCINF        dsmcc[DSMCCFILES];
+  char            *updtfnm;
   struct timespec st_mtim;  /* 最終修正時刻 */
+  struct timeval  dsmcc_pretv;
 } DSTRBINFO;
 
 typedef struct  ts_packet_list  {

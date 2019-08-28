@@ -6,9 +6,13 @@ udpdstrbtn rate <転送レート> dtsz <データサイズ> dstcnf <転送先情
 
 ## 分配先定義ファイルデータフォーマット
 
-ipadr=＜IPアドレス＞ [port=<ポート番号>]　[pid=<PID\> dsmccfile=<DSM-CCデータファイル>]
+1行、1宛先：
+
+ipadr=＜IPアドレス＞ [port=<ポート番号>]　[update=<更新通知ファイル> [pid1=<PID\> dsmcc1=<DSM-CCデータファイル>] [pid2=<PID\> dsmc2=<DSM-CCデータファイル>] [pid2=<PID\> dsmc2=<DSM-CCデータファイル>]]
 
 <PID\> ::= 4桁迄の16進
+
+<更新通知ファイル>　::= このファイルが更新されると、指定されたdsmccファイルの内、更新された内容をリロードします。
 
 
 
