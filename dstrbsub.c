@@ -35,11 +35,17 @@ char  *dsmccprms[] = {"dsmcc1=","dsmcc2=","dsmcc3="};
 char  *pidprms[] = {"pid1=","pid2=","pid3="};
 
 void
-make_destrib_info(char *lnbf)
+make_destrib_info(char *linep)
 {
+  char *lnbf;
   char  *cp, *stripadr, *strprt, *dsmccfl[DSMCCFILES], *strpid[DSMCCFILES], *updtf;
   int   ix, prtnm, nsprtnm, pid[DSMCCFILES];
   DSTRBINFO *dtrbp;
+
+  lnbf = linep;
+  while (isblank(*lnbf)){lnbf++;}
+  if (*lnbf == '#')
+    return; /* '#'始まりはコメント*/
 
   stripadr = NULL;
   updtf = NULL;
@@ -104,6 +110,10 @@ make_destrib_info(char *lnbf)
   }
   for (ix=0; ix<DSMCCFILES; ix++)
   {
+    if (dsmccfl[ix])
+    {
+      trim_line_end(dsmccfl[ix]);
+    }
     if (strpid[ix])
     {
       int lwc;
