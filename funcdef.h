@@ -5,3 +5,4 @@ void  recv_proc(void);
 void  dstrb_proc();
 void  make_destrib_info(char *lnbf);
 void  ts_dsmcc_section_preparation(DSTRBINFO *dp);
+void  dsmcc_preparation(DSMCCINF *dsmccp);

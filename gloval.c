@@ -10,3 +10,5 @@ int dstrbinfo_cnt = 0;
 
 TRNSINFO  transinfo;
 RCVINFO rcvinfo;
+
+QUE ts_pack_send_wroot = {&ts_pack_send_wroot, &ts_pack_send_wroot};

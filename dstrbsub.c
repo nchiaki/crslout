@@ -72,10 +72,12 @@ make_destrib_info(char *lnbf)
   for (ix=0; ix<DSMCCFILES; ix++)
   {
     cp = strstr(lnbf, dsmccprms[ix]);
+    if (cp)
     {
       dsmccfl[ix] = cp + strlen(dsmccprms[ix]);
     }
     cp = strstr(lnbf, pidprms[ix]);
+    if (cp)
     {
       strpid[ix] = cp + strlen(pidprms[ix]);
     }
@@ -152,6 +154,8 @@ make_destrib_info(char *lnbf)
           dtrbp->dsmcc[ix]._pid = pid[ix];
           dtrbp->dsmcc[ix]._fnm = dsmccfl[ix];
         }
+        dtrbp->st_mtim.tv_sec = 0;
+        dtrbp->st_mtim.tv_nsec = 0;
         dtrbp->updtfnm = updtf;
         ts_dsmcc_section_preparation(dtrbp);
 

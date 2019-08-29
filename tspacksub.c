@@ -91,68 +91,89 @@ dsmcc_ts_segmentation(int pid, void *dsmcc, off_t dsmcclen)
 }
 
 void
-ts_dsmcc_section_preparation(DSTRBINFO *dtrbp)
+dsmcc_preparation(DSMCCINF *dsmccp)
 {
-  int   fd, rtn, ix;
-  char *dsmccfnm;
-  struct stat sttbf;
+  char  *dsmccfnm;
+  int   rtn, fd;
   ssize_t act;
   void    *dtbf;
+  struct stat sttbf;
 
+  dsmccp->_data = NULL;
+  dsmccp->_len = 0;
+
+  dsmccfnm = dsmccp->_fnm;
+
+  if (!dsmccfnm)
+  {
+    return ;
+  }
+  fd = open(dsmccfnm, O_RDONLY);
+  if (fd < 0)
+  {
+    fprintf(stderr, "open error %s: %s\n", dsmccfnm, strerror(errno));
+    return ;
+  }
+  rtn = fstat(fd, &sttbf);
+  if (rtn < 0)
+  {
+    close(fd);
+    fprintf(stderr, "stat error %s: %s\n", dsmccfnm, strerror(errno));
+    return ;
+  }
+  dtbf = malloc(sttbf.st_size);
+  if (!dtbf)
+  {
+    close(fd);
+    fprintf(stderr, "malloc error %s: %s\n", dsmccfnm, strerror(errno));
+    return ;
+  }
+  act = read(fd, dtbf, sttbf.st_size);
+  if (act != sttbf.st_size)
+  {
+    close(fd);
+    free(dtbf);
+    if (act < 0)
+    {
+      fprintf(stderr, "read error %s: %s\n", dsmccfnm, strerror(errno));
+    }
+    else
+    {
+      fprintf(stderr, "read unmatch size %s: %ld/%ld\n", dsmccfnm, act, sttbf.st_size);
+    }
+    return ;
+  }
+
+  dsmccp->_data = dsmcc_ts_segmentation(dsmccp->_pid, dtbf, sttbf.st_size);
+  if (dsmccp->_data)
+  {
+      dsmccp->_len = sttbf.st_size;
+      dsmccp->_st_mtim = sttbf.st_mtim;
+  }
+  close(fd);
+  free(dtbf);
+
+  return;
+}
+
+void
+ts_dsmcc_section_preparation(DSTRBINFO *dtrbp)
+{
+  int   rtn, ix;
+  struct stat sttbf;
+
+  /* updateファイル情報 */
+  if (dtrbp->updtfnm)
+  {
+    rtn = stat(dtrbp->updtfnm, &sttbf);
+    if (0 <= rtn)
+      dtrbp->st_mtim = sttbf.st_mtim;
+  }
+
+  /* DSM-CCファイル情報 */
   for (ix=0; ix<DSMCCFILES; ix++)
   {
-    dtrbp->dsmcc[ix]._data = NULL;
-    dtrbp->dsmcc[ix]._len = 0;
-
-    dsmccfnm = dtrbp->dsmcc[ix]._fnm;
-
-    if (!dsmccfnm)
-    {
-      continue ;
-    }
-    fd = open(dsmccfnm, O_RDONLY);
-    if (fd < 0)
-    {
-      fprintf(stderr, "open error %s: %s\n", dsmccfnm, strerror(errno));
-      continue ;
-    }
-    rtn = fstat(fd, &sttbf);
-    if (rtn < 0)
-    {
-      close(fd);
-      fprintf(stderr, "stat error %s: %s\n", dsmccfnm, strerror(errno));
-      continue ;
-    }
-    dtbf = malloc(sttbf.st_size);
-    if (!dtbf)
-    {
-      close(fd);
-      fprintf(stderr, "malloc error %s: %s\n", dsmccfnm, strerror(errno));
-      continue ;
-    }
-    act = read(fd, dtbf, sttbf.st_size);
-    if (act != sttbf.st_size)
-    {
-      close(fd);
-      free(dtbf);
-      if (act < 0)
-      {
-        fprintf(stderr, "read error %s: %s\n", dsmccfnm, strerror(errno));
-      }
-      else
-      {
-        fprintf(stderr, "read unmatch size %s: %ld/%ld\n", dsmccfnm, act, sttbf.st_size);
-      }
-      continue ;
-    }
-
-    dtrbp->dsmcc[ix]._data = dsmcc_ts_segmentation(dtrbp->dsmcc[ix]._pid, dtbf, sttbf.st_size);
-    if (dtrbp->dsmcc[ix]._data)
-    {
-        dtrbp->dsmcc[ix]._len = sttbf.st_size;
-        dtrbp->dsmcc[ix]._st_mtim = sttbf.st_mtim;
-    }
-    free(dtbf);
+    dsmcc_preparation(&dtrbp->dsmcc[ix]);
   }
   return ;
 }

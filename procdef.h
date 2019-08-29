@@ -48,14 +48,15 @@ typedef struct recv_info {
 } RCVINFO;
 
 #define DSMCCFILES  3
-typedef struct dsmcc_file_info {
+typedef struct dsmcc_file_info {  /* DSM-CCファイル毎に用意 */
   int             _pid;
   char            *_fnm;
   void            *_data;
   int             _len;
   struct timespec _st_mtim;  /* 最終修正時刻 */
 } DSMCCINF;
-typedef struct destribution_info {
+
+typedef struct destribution_info {/* 転送先毎に用意 */
   QUE             queue;
   struct sockaddr_in dst_addr;
   socklen_t       addrlen;
@@ -67,10 +68,56 @@ typedef struct destribution_info {
   struct timeval  dsmcc_pretv;
 } DSTRBINFO;
 
-typedef struct  ts_packet_list  {
+typedef struct  ts_packet_list  { /* TSパケット毎に用意 */
   QUE     queue;
   char    tspack[188];
 } TSPACKLST;
+
+/**
+dstrbinfo_root
+ |
+ +-->  DSTRBINFO -----  --->  DSTRBINFO ---> DSTRBINFO ........
+        |
+        |  DSMCCINF -----
+        |   |        ---> root ----> TSPACKLST ---> TSPACKLST ---> TSPACKLST .....
+        |   +------------
+        |   |        ---> root .... or Null
+        |   +------------
+        |   |        ---> root .... or Null
+        |   +------------
+        |
+        +------------
+**/
+
+
+typedef struct ts_packet_send_wait_data {/* 送信待ち状態にあるDSM-CCデータ毎に*/
+  QUE       queue;
+  DSTRBINFO *dstrbinfo_home;
+  int       dsmcc_idx;
+  void      *dsmcc_data;
+  void      *next;
+} TSPACKSNDBLK;
+
+/**
+ts_pack_send_wroot
+  |
+  V
+TSPACKSNDBLK
+  |
+  V                              +---------------------------
+  TSPACKSNDBLK ----             |           +----+----+----+
+   |dstrbinfo_home ----> DSTRBINFO DSMCCINF |     |Null|    |
+   |                           |          +-~---+----+----+
+   |                           |            A     A    A  (Indicates any one)
+   |                           +------------|-----|----|--
+   |dsmcc_idx    ---------------------------+-----+----+
+   |
+   |dsmcc_data ----> root ----> TSPACKLST ---> TSPACKLST ---> TSPACKLST .....
+   |                 A           A               A             A
+   |next             |           |               |             |
+   |  Null or -------+-----------+---------------+-------------+
+   +----------------
+**/
 
 #define TSHDRZ  4
 
