@@ -26,15 +26,16 @@
 typedef struct trans_info {
   long  trnsrate;
   int   trnsdtsz;
-  struct timeval  alwble_trnstime;
-  struct timeval  dsmcc_intrvl;
+  struct timeval  alwble_trnstime;  // 指定された転送レートを時間に換算
+  struct timeval  next_trnstime;  // 次のUDPパケットが入力される予想時刻
+  struct timeval  dsmcc_intrvl; // DSM-CCのデフォルト送出間隔時間
 } TRNSINFO;
 
 #define TRNS_HDRS (MAC_HDRS+IPV4_HDRS+UDP_HDRS+RTP_HDRS)
 #define CALC_PACK_INTVL_USEC(r, d) (1000000/((r/8)/(TRNS_HDRS+d)))
 
 #define DSMCC_INTRVL_SEC  0
-#define DSMCC_INTRVL_USEC 100000
+#define DSMCC_INTRVL_USEC 100000  //  tr-b15 1/4 5.3.2 DII の最小感覚 100msec
 
 #define RCVDTARAZ 1500
 typedef struct recv_info {
@@ -44,7 +45,7 @@ typedef struct recv_info {
   int             dst_port;
   char            rcv_data[RCVDTARAZ];
   int             rcv_actlen;
-  struct timeval  rcv_time;
+  struct timeval  rcv_time; // UDPパケット受信時刻
 } RCVINFO;
 
 #define DSMCCFILES  3
@@ -53,6 +54,9 @@ typedef struct dsmcc_file_info {  /* DSM-CCファイル毎に用意 */
   char            *_fnm;
   void            *_data;
   int             _len;
+  struct timeval  _alwble_time; /* DSM-CC 次回送出間隔時間 */
+  struct timeval  _next_time; /* DSM-CC 次回送出時刻 */
+  struct timeval  _fire_time; /* DSM-CC 送信確定時間 */
   struct timespec _st_mtim;  /* 最終修正時刻 */
 } DSMCCINF;
 
@@ -65,7 +69,7 @@ typedef struct destribution_info {/* 転送先毎に用意 */
   DSMCCINF        dsmcc[DSMCCFILES];
   char            *updtfnm;
   struct timespec st_mtim;  /* 最終修正時刻 */
-  struct timeval  dsmcc_pretv;
+  //struct timeval  dsmcc_pretv;
 } DSTRBINFO;
 
 typedef struct  ts_packet_list  { /* TSパケット毎に用意 */

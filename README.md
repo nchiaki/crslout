@@ -8,9 +8,11 @@ udpdstrbtn rate <転送レート> dtsz <データサイズ> dstcnf <転送先情
 
 1行、1宛先：
 
-ipadr=＜IPアドレス＞ [port=<ポート番号>]　[update=<更新通知ファイル> [pid1=<PID\> dsmcc1=<DSM-CCデータファイル>] [pid2=<PID\> dsmc2=<DSM-CCデータファイル>] [pid2=<PID\> dsmc2=<DSM-CCデータファイル>]]
+ipadr=＜IPアドレス＞ [port=<ポート番号>]　[update=<更新通知ファイル> [pid1=<PID\> dsmcc1=<DSM-CCデータファイル>] [sintrvl1=<m秒>] [pid2=<PID\> dsmcc2=<DSM-CCデータファイル>] [sintrvl2=<m秒>] [pid3=<PID\> dsmcc3=<DSM-CCデータファイル>] [sintrvl3=<m秒>] ]
 
 <PID\> ::= 4桁迄の16進
+sndintrvl1..3 ::= 送出間隔（Def. 100msec）
+<m秒> ::= 100未満の指定は 100msec
 
 <更新通知ファイル>　::= このファイルが更新されると、指定されたdsmccファイルの内、更新された内容をリロードします。
 

@@ -24,4 +24,4 @@ $(TARGETS):	$(OBJS)
 clean:
 	$(RM) *~ $(TARGETS) $(OBJS)
 
-DBGFLG=
+DBGFLG= -DDSMCCSNDDBG
