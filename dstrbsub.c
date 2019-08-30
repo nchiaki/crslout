@@ -38,10 +38,16 @@ void
 make_destrib_info(char *linep)
 {
   char *lnbf;
-  char  *cp, *stripadr, *strprt, *dsmccfl[DSMCCFILES], *strpid[DSMCCFILES], *strintvl[DSMCCFILES], *updtf;
-  int   ix, prtnm, nsprtnm, pid[DSMCCFILES];
-  struct timeval  dsmccalwble[DSMCCFILES];
+  char  *cp, *stripadr, *strprt, *updtf;
+  int   ix, prtnm, nsprtnm;
   DSTRBINFO *dtrbp;
+  struct dsmcc_conf_parame {
+    char  *dsmccfl;
+    char  *strpid;
+    char  *strintvl;
+    int   pid;
+    struct timeval  dsmccalwble;
+  } dsmcc[DSMCCFILES];
 
   lnbf = linep;
   while (isblank(*lnbf)){lnbf++;}
@@ -54,10 +60,7 @@ make_destrib_info(char *linep)
   strprt = NULL;
   nsprtnm = 0;
 
-  memset(dsmccfl, 0, sizeof(dsmccfl));
-  memset(strpid, 0, sizeof(strpid));
-  memset(pid, 0, sizeof(pid));
-  memset(strintvl, 0, sizeof(strintvl));
+  memset(dsmcc, 0, sizeof(dsmcc));
 
   dtrbp = NULL;
 
@@ -82,19 +85,19 @@ make_destrib_info(char *linep)
     cp = strstr(lnbf, dsmccprms[ix]);
     if (cp)
     {
-      dsmccfl[ix] = cp + strlen(dsmccprms[ix]);
+      dsmcc[ix].dsmccfl = cp + strlen(dsmccprms[ix]);
     }
     cp = strstr(lnbf, pidprms[ix]);
     if (cp)
     {
-      strpid[ix] = cp + strlen(pidprms[ix]);
+      dsmcc[ix].strpid = cp + strlen(pidprms[ix]);
     }
 
-    dsmccalwble[ix] = transinfo.dsmcc_intrvl;
+    dsmcc[ix].dsmccalwble = transinfo.dsmcc_intrvl;
     cp = strstr(lnbf, sintrvl[ix]);
     if (cp)
     {
-      strintvl[ix] = cp + strlen(sintrvl[ix]);
+      dsmcc[ix].strintvl = cp + strlen(sintrvl[ix]);
     }
   }
 
@@ -119,34 +122,34 @@ make_destrib_info(char *linep)
   }
   for (ix=0; ix<DSMCCFILES; ix++)
   {
-    if (dsmccfl[ix])
+    if (dsmcc[ix].dsmccfl)
     {
-      trim_line_end(dsmccfl[ix]);
+      trim_line_end(dsmcc[ix].dsmccfl);
     }
-    if (strpid[ix])
+    if (dsmcc[ix].strpid)
     {
       int lwc;
-      trim_line_end(strpid[ix]);
-      cp = strpid[ix];
+      trim_line_end(dsmcc[ix].strpid);
+      cp = dsmcc[ix].strpid;
       while (*cp)
       {
         lwc = tolower(*cp);
         if (('0' <= lwc) && (lwc <= '9'))
-          {pid[ix] = ((pid[ix] << 4)|(lwc - '0'));}
+          {dsmcc[ix].pid = ((dsmcc[ix].pid << 4)|(lwc - '0'));}
         else
-          {pid[ix] = ((pid[ix] << 4)|((lwc - 'a')+10));}
+          {dsmcc[ix].pid = ((dsmcc[ix].pid << 4)|((lwc - 'a')+10));}
         cp++;
       }
     }
-    if (strintvl[ix])
+    if (dsmcc[ix].strintvl)
     {
-      trim_line_end(strintvl[ix]);
-      dsmccalwble[ix].tv_usec = atoi(strintvl[ix]) * 1000;  // msec to usec
-      dsmccalwble[ix].tv_sec = dsmccalwble[ix].tv_usec / 1000000;
-      dsmccalwble[ix].tv_usec %= 1000000;
-      if (timercmp(&dsmccalwble[ix], &transinfo.dsmcc_intrvl, <))
+      trim_line_end(dsmcc[ix].strintvl);
+      dsmcc[ix].dsmccalwble.tv_usec = atoi(dsmcc[ix].strintvl) * 1000;  // msec to usec
+      dsmcc[ix].dsmccalwble.tv_sec = dsmcc[ix].dsmccalwble.tv_usec / 1000000;
+      dsmcc[ix].dsmccalwble.tv_usec %= 1000000;
+      if (timercmp(&dsmcc[ix].dsmccalwble, &transinfo.dsmcc_intrvl, <))
       {
-        dsmccalwble[ix] = transinfo.dsmcc_intrvl;
+        dsmcc[ix].dsmccalwble = transinfo.dsmcc_intrvl;
       }
     }
   }
@@ -181,9 +184,9 @@ make_destrib_info(char *linep)
 #endif
         for (ix=0; ix<DSMCCFILES; ix++)
         {
-          dtrbp->dsmcc[ix]._pid = pid[ix];
-          dtrbp->dsmcc[ix]._fnm = dsmccfl[ix];
-          dtrbp->dsmcc[ix]._alwble_time = dsmccalwble[ix]; /* DSM-CC 次回送出間隔時間 */
+          dtrbp->dsmcc[ix]._pid = dsmcc[ix].pid;
+          dtrbp->dsmcc[ix]._fnm = dsmcc[ix].dsmccfl;
+          dtrbp->dsmcc[ix]._alwble_time = dsmcc[ix].dsmccalwble; /* DSM-CC 次回送出間隔時間 */
           dtrbp->dsmcc[ix]._next_time.tv_sec = 0; /* DSM-CC 次回送出時刻 */
           dtrbp->dsmcc[ix]._next_time.tv_usec = 0;
         }

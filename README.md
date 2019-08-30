@@ -8,7 +8,7 @@ udpdstrbtn rate <転送レート> dtsz <データサイズ> dstcnf <転送先情
 
 1行、1宛先：
 
-ipadr=＜IPアドレス＞ [port=<ポート番号>]　[update=<更新通知ファイル> [pid1=<PID\> dsmcc1=<DSM-CCデータファイル>] [sintrvl1=<m秒>] [pid2=<PID\> dsmcc2=<DSM-CCデータファイル>] [sintrvl2=<m秒>] [pid3=<PID\> dsmcc3=<DSM-CCデータファイル>] [sintrvl3=<m秒>] ]
+ipadr=＜IPアドレス＞ [port=<ポート番号>]　[update=<更新通知ファイル> [pid1=<PID\> dsmcc1=<DSM-CCデータファイル> [sintrvl1=<m秒>]] [pid2=<PID\> dsmcc2=<DSM-CCデータファイル> [sintrvl2=<m秒>]] [pid3=<PID\> dsmcc3=<DSM-CCデータファイル> [sintrvl3=<m秒>]]]
 
 <PID\> ::= 4桁迄の16進
 sndintrvl1..3 ::= 送出間隔（Def. 100msec）
