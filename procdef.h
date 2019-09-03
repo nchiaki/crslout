@@ -36,6 +36,7 @@ typedef struct trans_info {
 } TRNSINFO;
 
 #define TRNSDATZ_DEF  (IP_MTU_DEF-(IP_MTU_DEF-(MAC_HDRS+IPV4_HDRS+UDP_HDRS+RTP_HDRS))%TSPACKZ)
+#define MAXTS_IN_PACK ((IP_MTU_DEF-(MAC_HDRS+IPV4_HDRS+UDP_HDRS+RTP_HDRS))/TSPACKZ)
 
 #define TRNS_HDRS (MAC_HDRS+IPV4_HDRS+UDP_HDRS+RTP_HDRS)
 #define CALC_PACK_INTVL_USEC(r, d) (1000000/((r/8)/(TRNS_HDRS+d)))
@@ -80,7 +81,8 @@ typedef struct destribution_info {/* 転送先毎に用意 */
 
 typedef struct  ts_packet_list  { /* TSパケット毎に用意 */
   QUE     queue;
-  char    tspack[188];
+  int     tspacklen;
+  char    tspack[(TSPACKZ*MAXTS_IN_PACK)+RTP_HDRS];
 } TSPACKLST;
 
 /**

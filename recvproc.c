@@ -57,7 +57,7 @@ recv_proc(void)
 
               tsplp = (TSPACKLST *)tspcksdbkp->next;
 
-              sndact = sendto(dstrinfp->sock, tsplp->tspack, sizeof(tsplp->tspack), 0, (struct sockaddr *)&(dstrinfp->dst_addr), sizeof(dstrinfp->dst_addr));
+              sndact = sendto(dstrinfp->sock, tsplp->tspack, tsplp->tspacklen, 0, (struct sockaddr *)&(dstrinfp->dst_addr), sizeof(dstrinfp->dst_addr));
               if (sndact < 0)
               {
                 fprintf(stderr, "sendto(dmscc%d): %s\n", tspcksdbkp->dsmcc_idx, strerror(errno));
