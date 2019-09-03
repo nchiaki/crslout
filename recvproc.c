@@ -11,7 +11,7 @@
 #include  "glovaldef.h"
 
 long  recv_maxnulls = 0;
-char  pre_rcv_data_byte;
+unsigned short int  pre_rcv_data_seq;
 int   sqchks = 0;
 int   sqchers = 0;
 void
@@ -57,6 +57,7 @@ recv_proc(void)
 
               tsplp = (TSPACKLST *)tspcksdbkp->next;
 
+              memcpy(tsplp->tspack, rcvinfo.rcv_data, RTP_HDRS);
               sndact = sendto(dstrinfp->sock, tsplp->tspack, tsplp->tspacklen, 0, (struct sockaddr *)&(dstrinfp->dst_addr), sizeof(dstrinfp->dst_addr));
               if (sndact < 0)
               {
@@ -101,18 +102,21 @@ recv_proc(void)
 
   if (seqchkf)
   {
-    if ((pre_rcv_data_byte+1) != rcvinfo.rcv_data[0])
+    unsigned short int rcvseq;
+    rcvseq = (rcvinfo.rcv_data[2] << 8) | rcvinfo.rcv_data[3];
+    //printf("%u\n",rcvseq);
+    if ((pre_rcv_data_seq+1) != rcvseq)
     {
       if (1 < sqchks)
       {
-        if (!(((unsigned char)pre_rcv_data_byte == 255) && ((unsigned char)rcvinfo.rcv_data[0] == 0)))
+        if (!((pre_rcv_data_seq == 0xffff) && (rcvseq == 0)))
         {
-          printf("RD SQER %d -> %d\n", pre_rcv_data_byte, rcvinfo.rcv_data[0]);
+          printf("RD SQER %u -> %u\n", pre_rcv_data_seq, rcvseq);
           sqchers++;
         }
       }
     }
-    pre_rcv_data_byte =  rcvinfo.rcv_data[0];
+    pre_rcv_data_seq = rcvseq;
     sqchks++;
   }
 }
