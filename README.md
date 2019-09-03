@@ -9,10 +9,10 @@ udpdstrbtn rate <転送レート> dtsz <データサイズ> dstcnf <分配先情
 1行、1宛先：
 
 <pre>
-ipadr=＜IPアドレス＞ [port=<ポート番号>]　
-       [update=<更新通知ファイル> [pid1=<PID\> dsmcc1=<DSM-CCデータファイル> [sintrvl1=<m秒>]]
-                                [pid2=<PID\> dsmcc2=<DSM-CCデータファイル> [sintrvl2=<m秒>]]
-                                [pid3=<PID\> dsmcc3=<DSM-CCデータファイル> [sintrvl3=<m秒>]]]
+ipadr=%lt;sIPアドレス> [port=%lt;ポート番号>]　
+       [update=%lt;更新通知ファイル> [pid1=%lt;PID> dsmcc1=%lt;DSM-CCデータファイル> [sintrvl1=%lt;m秒>]]
+                                [pid2=%lt;PID> dsmcc2=%lt;DSM-CCデータファイル> [sintrvl2=%lt;m秒>]]
+                                [pid3=%lt;PID> dsmcc3=%lt;DSM-CCデータファイル> [sintrvl3=%lt;m秒>]]]
 </pre>
 
 <table>
