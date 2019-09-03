@@ -69,6 +69,7 @@ init_proc(void)
       make_destrib_info(lnbf);
       fgrtn = fgets(lnbf, sizeof(lnbf)-1, cffl);
     }
+    fclose(cffl);
   }
 
 }

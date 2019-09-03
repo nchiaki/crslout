@@ -109,7 +109,13 @@ dstrb_proc()
                 }
                 free(dsmcc_root);
                 dstrinfp->dsmcc[ix]._data = NULL;
-
+#ifdef        DSMCCUPDTDBG
+                {
+                  struct timeval  nwtm;
+                  gettimeofday(&nwtm, NULL);
+                  printf("%ld.%06ld %s Updata[%d]\n", nwtm.tv_sec, nwtm.tv_usec, inet_ntoa(dstrinfp->dst_addr.sin_addr), ix);
+                }
+#endif
                 /* updateされたデータの取得*/
                 dsmcc_preparation(&dstrinfp->dsmcc[ix]);
                 dstrinfp->dsmcc[ix]._st_mtim = sttbf.st_mtim;
@@ -128,7 +134,7 @@ dstrb_proc()
               if (tspcksdbkp)
               {/* DSM-CCの送出は、UDP受信待ちの空き時間で行う */
                 dstrinfp->dsmcc[ix]._fire_time = nwtm;
-                
+
                 tspcksdbkp->dstrbinfo_home = dstrinfp;
                 tspcksdbkp->dsmcc_idx = ix;
                 dstrinfp->dsmcc[ix]._data = NULL;

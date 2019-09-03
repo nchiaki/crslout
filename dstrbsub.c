@@ -108,6 +108,12 @@ make_destrib_info(char *linep)
   if (updtf)
   {
     trim_line_end(updtf);
+    cp = malloc(strlen(updtf)+1);
+    if (cp)
+    {
+        strcpy(cp, updtf);
+        updtf = cp;
+    }
   }
 
   if (strprt)
@@ -125,6 +131,12 @@ make_destrib_info(char *linep)
     if (dsmcc[ix].dsmccfl)
     {
       trim_line_end(dsmcc[ix].dsmccfl);
+      cp = malloc(strlen(dsmcc[ix].dsmccfl)+1);
+      if (cp)
+      {
+          strcpy(cp, dsmcc[ix].dsmccfl);
+          dsmcc[ix].dsmccfl = cp;
+      }
     }
     if (dsmcc[ix].strpid)
     {
