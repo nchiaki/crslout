@@ -19,13 +19,16 @@ usage(char *nm)
 {
   char  *iam;
   iam = basename(nm);
-  printf("%s rate <transRate> dtsz <dataSize> rsock <IP4addr>:<port> dstcnf <destributionConfFile> [seqchk]\n", iam);
+  printf("%s rate <transRate> [dtsz <dataSize>] rsock <IP4addr>:<port> dstcnf <destributionConfFile> [seqchk]\n", iam);
+  printf("\t<dataSize> : Def. %d\n", TRNSDATZ_DEF);
 }
 
 void
 cmdproc(int ac, char *av[])
 {
   int ix;
+
+  transinfo.trnsdtsz = TRNSDATZ_DEF;
 
   for  (ix=1; ix<ac; ix++)
   {

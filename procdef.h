@@ -18,10 +18,14 @@
 * パケット受信時刻
 * 転送先情報（宛先アドレス、宛先ポート番号）(N件、保存情報)
 **/
+#define IP_MTU_DEF  1500
+
 #define MAC_HDRS  14
 #define IPV4_HDRS 20
 #define UDP_HDRS  8
 #define RTP_HDRS  12
+
+#define TSPACKZ 188
 
 typedef struct trans_info {
   long  trnsrate;
@@ -30,6 +34,8 @@ typedef struct trans_info {
   struct timeval  next_trnstime;  // 次のUDPパケットが入力される予想時刻
   struct timeval  dsmcc_intrvl; // DSM-CCのデフォルト送出間隔時間
 } TRNSINFO;
+
+#define TRNSDATZ_DEF  (IP_MTU_DEF-(IP_MTU_DEF-(MAC_HDRS+IPV4_HDRS+UDP_HDRS+RTP_HDRS))%TSPACKZ)
 
 #define TRNS_HDRS (MAC_HDRS+IPV4_HDRS+UDP_HDRS+RTP_HDRS)
 #define CALC_PACK_INTVL_USEC(r, d) (1000000/((r/8)/(TRNS_HDRS+d)))

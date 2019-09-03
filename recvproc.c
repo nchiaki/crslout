@@ -91,11 +91,13 @@ recv_proc(void)
   gettimeofday(&rcvinfo.rcv_time, NULL);
   timeradd(&rcvinfo.rcv_time, &transinfo.alwble_trnstime, &transinfo.next_trnstime);
 
+#ifdef  RSVNLLDBG
   if (recv_maxnulls < recvnulls)
   {
     printf("Rcv MAX NULLs %ld\n", recvnulls);
     recv_maxnulls = recvnulls;
   }
+#endif
 
   if (seqchkf)
   {

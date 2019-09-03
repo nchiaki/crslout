@@ -57,6 +57,8 @@ dstrb_proc()
         }
         break;
     }
+    else
+      mxsndcnt = 0;
 
     /*== DSM-CC データの存在チェックと送出 ==*/
     flg.dsmccalv = 0;

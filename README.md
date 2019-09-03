@@ -2,7 +2,16 @@
 
 ## コマンドusage
 
-udpdstrbtn rate <転送レート> dtsz <データサイズ> dstcnf <分配先情報ファイル>
+udpdstrbtn rate &lt;転送レート> dtsz &lt;データサイズ> dstcnf &lt;分配先情報ファイル>
+
+<table>
+<tr><th>&lt;転送レート></th><td>10進値（必須）</td></tr>
+<tr><th>&lt;データサイズ></th><td>10進値（Def. 1370）</td></tr>
+</table>
+
+&lt;転送レート>と&lt;データサイズ>からパケット受信間隔時間を求め、
+その間を分配時間に割り当てます。
+
 
 ## 「分配先定義ファイル」データフォーマット
 
