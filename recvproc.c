@@ -14,6 +14,9 @@ long  recv_maxnulls = 0;
 unsigned short int  pre_rcv_data_seq;
 int   sqchks = 0;
 int   sqchers = 0;
+#ifdef        DSMCCSNDDBG
+struct timeval  pre_dsmcc_strttm[DSMCCFILES];
+#endif
 void
 recv_proc(void)
 {
@@ -41,10 +44,14 @@ recv_proc(void)
 
             if (!tspcksdbkp->next)
             {
-#ifdef        DSMCCSNDDBG
               gettimeofday(&nwtm, NULL);
-              printf("%ld.%06ld %s DSMCC[%d]\n", nwtm.tv_sec, nwtm.tv_usec, inet_ntoa(dstrinfp->dst_addr.sin_addr), tspcksdbkp->dsmcc_idx);
+#ifdef        DSMCCSNDDBG
+              struct timeval  tmptm;
+              timersub(&nwtm, &pre_dsmcc_strttm[tspcksdbkp->dsmcc_idx], &tmptm);
+              printf("%ld.%06ld %s DSMCC[%d] %ld.%06ld\n", nwtm.tv_sec, nwtm.tv_usec, inet_ntoa(dstrinfp->dst_addr.sin_addr), tspcksdbkp->dsmcc_idx, tmptm.tv_sec, tmptm.tv_usec);
+              pre_dsmcc_strttm[tspcksdbkp->dsmcc_idx] = nwtm;
 #endif
+              dstrinfp->dsmcc[tspcksdbkp->dsmcc_idx]._fire_time = nwtm;
               tspcksdbkp->next = NEXT(tspcksdbkp->dsmcc_data);  /* DSM-CC送出待ちデータブロックにおける先頭データ*/
             }
             else
@@ -58,6 +65,8 @@ recv_proc(void)
               tsplp = (TSPACKLST *)tspcksdbkp->next;
 
               memcpy(tsplp->tspack, rcvinfo.rcv_data, RTP_HDRS);
+              WDSEQ_SET2BYTE(&tsplp->tspack[2], dstrinfp->oseqnum);
+              dstrinfp->oseqnum++;
               sndact = sendto(dstrinfp->sock, tsplp->tspack, tsplp->tspacklen, 0, (struct sockaddr *)&(dstrinfp->dst_addr), sizeof(dstrinfp->dst_addr));
               if (sndact < 0)
               {

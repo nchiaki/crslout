@@ -33,6 +33,8 @@ dstrb_proc()
   dstrinfp = (DSTRBINFO *)NEXT(&dstrbinfo_root);
   while (dstrinfp !=  (DSTRBINFO *)&dstrbinfo_root)
   {
+    WDSEQ_SET2BYTE(&rcvinfo.rcv_data[2], dstrinfp->oseqnum);
+    dstrinfp->oseqnum++;
     sndact = sendto(dstrinfp->sock, rcvinfo.rcv_data, rcvinfo.rcv_actlen, 0, (struct sockaddr *)&(dstrinfp->dst_addr), sizeof(dstrinfp->dst_addr));
     if (sndact < 0)
     {
@@ -129,13 +131,14 @@ dstrb_proc()
         dsmcc_root = dstrinfp->dsmcc[ix]._data;
         if (dsmcc_root)
         {/* DSM-CCデータ送出 */
+          gettimeofday(&nwtm, NULL);
           if (timercmp(&dstrinfp->dsmcc[ix]._next_time, &nwtm, <=))
           {
               TSPACKSNDBLK  *tspcksdbkp;
               tspcksdbkp = malloc(sizeof(TSPACKSNDBLK));
               if (tspcksdbkp)
               {/* DSM-CCの送出は、UDP受信待ちの空き時間で行う */
-                dstrinfp->dsmcc[ix]._fire_time = nwtm;
+                //dstrinfp->dsmcc[ix]._fire_time = nwtm;
 
                 tspcksdbkp->dstrbinfo_home = dstrinfp;
                 tspcksdbkp->dsmcc_idx = ix;
@@ -148,18 +151,6 @@ dstrb_proc()
               {
                 fprintf(stderr, "No more DSM-CC TSPACKSNDBLK %s[%d]: %s\n", inet_ntoa(dstrinfp->dst_addr.sin_addr), ix, strerror(errno));
               }
-#if 0
-              tsplp = (TSPACKLST *)NEXT(dsmcc_root);
-              while (tsplp != (TSPACKLST *)dsmcc_root)
-              {
-                sndact = sendto(dstrinfp->sock, tsplp->tspack, sizeof(tsplp->tspack), 0, (struct sockaddr *)&(dstrinfp->dst_addr), sizeof(dstrinfp->dst_addr));
-                if (sndact < 0)
-                {
-                  fprintf(stderr, "sendto(dmscc%d): %s\n", ix, strerror(errno));
-                }
-                tsplp = (TSPACKLST *)NEXT(tsplp);
-              }
-#endif
             }
         }
       } //for (ix=0; ix<DSMCCFILES; ix++)

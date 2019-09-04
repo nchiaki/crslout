@@ -76,8 +76,10 @@ typedef struct destribution_info {/* 転送先毎に用意 */
   DSMCCINF        dsmcc[DSMCCFILES];
   char            *updtfnm;
   struct timespec st_mtim;  /* 最終修正時刻 */
-  //struct timeval  dsmcc_pretv;
+  unsigned short int  oseqnum;
 } DSTRBINFO;
+
+#define WDSEQ_SET2BYTE(b, w)  {(b)[0] = ((w)&0xff00)>>8; (b)[1] = (w)&0x00ff;}
 
 typedef struct  ts_packet_list  { /* TSパケット毎に用意 */
   QUE     queue;

@@ -38,7 +38,7 @@ void
 make_destrib_info(char *linep)
 {
   char *lnbf;
-  char  *cp, *stripadr, *strprt, *updtf;
+  char  *srhp, *cp, *stripadr, *strprt, *updtf;
   int   ix, prtnm, nsprtnm;
   DSTRBINFO *dtrbp;
   struct dsmcc_conf_parame {
@@ -64,40 +64,48 @@ make_destrib_info(char *linep)
 
   dtrbp = NULL;
 
+  srhp = strstr(lnbf, "#"); // 設定行途中の#以降はコメント扱い
+
   cp = strstr(lnbf, "ipadr=");
   if (cp)
   {
-    stripadr = cp + strlen("ipadr=");
+    if (!srhp || (cp < srhp))
+      stripadr = cp + strlen("ipadr=");
   }
   cp = strstr(lnbf, "port=");
   if (cp)
   {
-    strprt = cp + strlen("port=");
+    if (!srhp || (cp < srhp))
+      strprt = cp + strlen("port=");
   }
 
   cp = strstr(lnbf, "update=");
   if (cp)
   {
-    updtf = cp + strlen("update=");
+    if (!srhp || (cp < srhp))
+      updtf = cp + strlen("update=");
   }
   for (ix=0; ix<DSMCCFILES; ix++)
   {
     cp = strstr(lnbf, dsmccprms[ix]);
     if (cp)
     {
-      dsmcc[ix].dsmccfl = cp + strlen(dsmccprms[ix]);
+      if (!srhp || (cp < srhp))
+        dsmcc[ix].dsmccfl = cp + strlen(dsmccprms[ix]);
     }
     cp = strstr(lnbf, pidprms[ix]);
     if (cp)
     {
-      dsmcc[ix].strpid = cp + strlen(pidprms[ix]);
+      if (!srhp || (cp < srhp))
+        dsmcc[ix].strpid = cp + strlen(pidprms[ix]);
     }
 
     dsmcc[ix].dsmccalwble = transinfo.dsmcc_intrvl;
     cp = strstr(lnbf, sintrvl[ix]);
     if (cp)
     {
-      dsmcc[ix].strintvl = cp + strlen(sintrvl[ix]);
+      if (!srhp || (cp < srhp))
+        dsmcc[ix].strintvl = cp + strlen(sintrvl[ix]);
     }
   }
 
