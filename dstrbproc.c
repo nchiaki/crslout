@@ -35,13 +35,17 @@ dstrb_proc()
   {
     WDSEQ_SET2BYTE(&rcvinfo.rcv_data[2], dstrinfp->oseqnum);
     dstrinfp->oseqnum++;
+
     sndact = sendto(dstrinfp->sock, rcvinfo.rcv_data, rcvinfo.rcv_actlen, 0, (struct sockaddr *)&(dstrinfp->dst_addr), sizeof(dstrinfp->dst_addr));
     if (sndact < 0)
     {
-      fprintf(stderr, "sendto: %s\n", strerror(errno));
+      fprintf(stderr, "%s:sendto: %s\n", inet_ntoa(dstrinfp->dst_addr.sin_addr), strerror(errno));
     }
     else
     {
+#ifdef  DSTRBSNDDBG
+      printf("SND %s\n", inet_ntoa(dstrinfp->dst_addr.sin_addr));
+#endif
       sndcnt++;
     }
     gettimeofday(&nwtm, NULL);

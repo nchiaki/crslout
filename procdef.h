@@ -26,6 +26,7 @@
 #define RTP_HDRS  12
 
 #define TSPACKZ 188
+#define UDPRCVBUFSZ (1024*1024)
 
 typedef struct trans_info {
   long  trnsrate;
